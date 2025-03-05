@@ -3,10 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Success</title>
+    <title>Payment Successful</title>
 </head>
 <body>
     <h1>Payment Successful!</h1>
-    <p>Thank you for your purchase.</p>
+    <p>Thank you for your purchase. You are now a premium user.</p>
+
+    <script>
+        // Check for the "payment" query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentStatus = urlParams.get('payment');
+
+        if (paymentStatus === 'success') {
+            // Display the success message
+            document.querySelector('h1').textContent = 'Payment Successful!';
+            document.querySelector('p').textContent = 'Thank you for your purchase. You are now a premium user.';
+        } else {
+            // Handle other cases (e.g., payment failed)
+            document.querySelector('h1').textContent = 'Payment Status Unknown';
+            document.querySelector('p').textContent = 'Please check your email for payment confirmation.';
+        }
+    </script>
 </body>
 </html>
