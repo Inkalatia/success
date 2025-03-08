@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,14 +11,18 @@
     <p>Thank you for your purchase. You are now a premium user.</p>
 
     <script>
-        // Check for the "payment" query parameter
+        // Check for the "payment" and "email" query parameters
         const urlParams = new URLSearchParams(window.location.search);
         const paymentStatus = urlParams.get('payment');
+        const email = urlParams.get('email');
 
-        if (paymentStatus === 'success') {
+        if (paymentStatus === 'success' && email) {
             // Display the success message
             document.querySelector('h1').textContent = 'Payment Successful!';
             document.querySelector('p').textContent = 'Thank you for your purchase. You are now a premium user.';
+
+            // Notify the Godot game (using a custom URI scheme or local server)
+            window.location.href = `godot://payment_success?email=${encodeURIComponent(email)}`;
         } else {
             // Handle other cases (e.g., payment failed)
             document.querySelector('h1').textContent = 'Payment Status Unknown';
