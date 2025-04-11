@@ -4,44 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 2rem;
+        }
+        .message-box {
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+        .premium { background-color: #e8f5e9; }
+        .shop { background-color: #e3f2fd; }
+    </style>
 </head>
 <body>
-    <h1>Payment Successful!</h1>
-    <p>Thank you for your purchase. You are now a premium user.</p>
+    <div id="message-container" class="message-box">
+        <h1 id="title">Payment Successful!</h1>
+        <p id="description">Thank you for your purchase.</p>
+    </div>
 
     <script>
-        // Check for the "payment" and "email" query parameters
+        // Parse URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const paymentStatus = urlParams.get('payment');
+        const paymentType = urlParams.has('product_id') ? 'shop' : 'premium';
         const email = urlParams.get('email');
+        const productId = urlParams.get('product_id');
+        const sessionId = urlParams.get('session_id');
 
-        if (paymentStatus === 'success' && email) {
-            // Display the success message
-            document.querySelector('h1').textContent = 'Payment Successful!';
-            document.querySelector('p').textContent = 'Thank you for your purchase. You are now a premium user.';
+        // Update display based on purchase type
+        const container = document.getElementById('message-container');
+        const title = document.getElementById('title');
+        const description = document.getElementById('description');
 
-            // Send a POST request to the local HTTP server in Godot
-            fetch('http://localhost:8080', {
+        if (paymentType === 'shop' && productId) {
+            container.classList.add('shop');
+            title.textContent = 'Purchase Complete!';
+            description.textContent = `Your item (${productId}) has been unlocked.`;
+        } else if (paymentType === 'premium') {
+            container.classList.add('premium');
+            title.textContent = 'Premium Activated!';
+            description.textContent = 'You now have full premium access.';
+        }
+
+        // Send confirmation to Godot
+        if (email) {
+            const port = paymentType === 'shop' ? 8081 : 8080;
+            const body = new URLSearchParams();
+            body.append('email', email);
+            if (productId) body.append('product_id', productId);
+
+            fetch(`http://localhost:${port}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `email=${encodeURIComponent(email)}`,
+                body: body
             })
             .then(response => {
                 if (response.ok) {
-                    console.log("Payment confirmation sent to Godot.");
-                } else {
-                    console.error("Failed to send payment confirmation.");
+                    console.log("Confirmation sent to Godot");
+                    // Close window after 5 seconds
+                    setTimeout(() => window.close(), 5000);
                 }
             })
             .catch(error => {
-                console.error("Error sending payment confirmation:", error);
+                console.error("Error:", error);
             });
-        } else {
-            // Handle other cases (e.g., payment failed)
-            document.querySelector('h1').textContent = 'Payment Status Unknown';
-            document.querySelector('p').textContent = 'Please check your email for payment confirmation.';
         }
     </script>
 </body>
