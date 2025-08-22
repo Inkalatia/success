@@ -34,6 +34,7 @@
         const email = urlParams.get('email');
         const productId = urlParams.get('product_id');
         const sessionId = urlParams.get('session_id');
+        const game = urlParams.get('game') || 'owlyfly'; // Default to owlyfly for backward compatibility
 
         // Update display based on purchase type
         const container = document.getElementById('message-container');
@@ -52,10 +53,18 @@
 
         // Send confirmation to Godot
         if (email) {
-            const port = paymentType === 'shop' ? 8081 : 8080;
+            // Determine port based on game and payment type
+            let port;
+            if (game === 'fantasypuzzle') {
+                port = paymentType === 'shop' ? 8081 : 8080;
+            } else { // owlyfly or default
+                port = paymentType === 'shop' ? 8081 : 8080;
+            }
+            
             const body = new URLSearchParams();
             body.append('email', email);
             if (productId) body.append('product_id', productId);
+            if (game) body.append('game', game);
 
             fetch(`http://localhost:${port}`, {
                 method: 'POST',
